@@ -1,10 +1,13 @@
 import Head from 'next/head'
-import Image from 'next/image'
+
 import styles from '../styles/Home.module.css'
 import Banner from '../components/banner'
 import CoffeeCards from '../components/coffeecards'
-import Stores from "../public/coffee-stores.json";
+
 import {fetchCoffeeStores} from "../lib/coffee_store";
+
+import trackGeoLocation from "../hooks/trackGeoLocation";
+
 
 export async function getStaticProps(context)  {
   const storeData = await fetchCoffeeStores();
@@ -17,7 +20,10 @@ export async function getStaticProps(context)  {
 
 
 export default function Home(props) {
+  const {latLng, trackLocation, locationErrorMsg, findingLocation} = trackGeoLocation();
+  
   const {Stores } = props;
+
   return (
     <div className={styles.container}>
       <Head>
@@ -26,7 +32,7 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Banner buttonText={"Locate your coffee"} id="0" />
+      <Banner buttonText={findingLocation ? "Loading..." : "Locate your coffee"} id="0" clickHandler={trackLocation}/>
 
       <CoffeeCards Stores={Stores}/>
     </div>

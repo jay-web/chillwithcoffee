@@ -5,6 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { Button, CardActionArea, CardActions } from '@mui/material';
 import Link from "next/link"
+import Image from 'next/image'
 
  const CoffeeCard = (props) => {
      const {id, name, imgUrl, websiteUrl, address, neighbourhood} = props.store;
@@ -13,10 +14,10 @@ import Link from "next/link"
       <Link href={`./coffee-store/${id}`}>
     <Card sx={{ maxWidth: 500, minHeight: 250 , maxHeight: 300}}>
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height="200"
-          image={imgUrl}
+        <Image
+          width={500}
+          height={220}
+          src={imgUrl}
           alt={name}
         />
         <CardContent>
