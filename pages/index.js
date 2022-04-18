@@ -1,28 +1,36 @@
-import Head from 'next/head'
+import React, { useEffect, useState } from "react";
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import Banner from "../components/banner";
+import CoffeeCards from "../components/coffeecards";
 
-import styles from '../styles/Home.module.css'
-import Banner from '../components/banner'
-import CoffeeCards from '../components/coffeecards'
-
-import {fetchCoffeeStores} from "../lib/coffee_store";
+import { fetchCoffeeStores } from "../lib/coffee_store";
 
 import trackGeoLocation from "../hooks/trackGeoLocation";
 
-
-export async function getStaticProps(context)  {
+export async function getStaticProps(context) {
   const storeData = await fetchCoffeeStores();
   return {
-      props: {
-          Stores: storeData
-      }
-  }
+    props: {
+      Stores: storeData,
+    },
+  };
 }
 
-
 export default function Home(props) {
-  const {latLng, trackLocation, locationErrorMsg, findingLocation} = trackGeoLocation();
-  
-  const {Stores } = props;
+  const { latLng, trackLocation, locationErrorMsg, findingLocation } =
+    trackGeoLocation();
+  console.log(latLng);
+  const { Stores } = props; // Stores which we are pre-rendering
+  const [storesByLocation, setStoresByLocation] = useState("");
+
+  useEffect(async () => {
+    if (latLng) {
+      const storesByLocation = await fetchCoffeeStores(latLng);
+      console.log({ storesByLocation });
+      setStoresByLocation(storesByLocation);
+    }
+  }, [latLng]);
 
   return (
     <div className={styles.container}>
@@ -32,9 +40,22 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Banner buttonText={findingLocation ? "Loading..." : "Locate your coffee"} id="0" clickHandler={trackLocation}/>
-
-      <CoffeeCards Stores={Stores}/>
+      <Banner
+        buttonText={findingLocation ? "Loading..." : "Locate your coffee"}
+        id="0"
+        clickHandler={trackLocation}
+      />
+      {locationErrorMsg && <p>Something went wrong: {locationErrorMsg}</p>}
+      {storesByLocation && (
+        <div>
+          <h1>Coffee Stores Near you </h1>
+          <CoffeeCards Stores={Stores} />
+        </div>
+      )}
+      <div>
+        <h1>Coffee Stores </h1>
+        <CoffeeCards Stores={Stores} />
+      </div>
     </div>
-  )
+  );
 }
