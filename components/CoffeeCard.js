@@ -1,41 +1,38 @@
 import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import { Button, CardActionArea, CardActions } from '@mui/material';
+
+import { Button} from '@mui/material';
 import Link from "next/link"
 import Image from 'next/image'
 
+import styles from "../styles/CoffeeCard.module.css";
+
  const CoffeeCard = (props) => {
      const {id, name, imgUrl, websiteUrl, address, neighbourhood} = props.store;
-     const {pass} = props;
+     
   return (
-      <Link href={`./coffee-store/${id}`}>
-    <Card sx={{ maxWidth: 500, minHeight: 250 , maxHeight: 300}}>
-      <CardActionArea>
+      
+    // <Card sx={{ maxWidth: 500, minHeight: 250 , maxHeight: 300}}>
+      <div className={styles.card}>
         <Image
           width={500}
           height={220}
           src={imgUrl}
           alt={name}
         />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {address}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-      <CardActions>
-        <Button size="small" color="primary">
-          {neighbourhood}
-        </Button>
-      </CardActions>
-    </Card>
-    </Link>
+        <Link href={`/coffee-store/${id}`}>
+          <a>
+          <div className={styles.content}>
+            <h2>
+              {name}
+            </h2>
+          
+           
+          </div>
+         </a>
+        </Link>
+    
+      </div>
+    
   );
 }
 

@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { StoreContext } from "../hooks/context";
+import {ACTION_TYPES} from "../hooks/storeReducer";
+
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import Banner from "../components/banner";
@@ -9,28 +12,32 @@ import { fetchCoffeeStores } from "../lib/coffee_store";
 import trackGeoLocation from "../hooks/trackGeoLocation";
 
 export async function getStaticProps(context) {
-  const storeData = await fetchCoffeeStores();
+  let origin = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  origin = origin.split("/")[0];
+
+  const storeData = await fetchCoffeeStores("", origin);
   return {
     props: {
       Stores: storeData,
+      origin: origin
     },
   };
 }
 
 export default function Home(props) {
-  const { latLng, trackLocation, locationErrorMsg, findingLocation } =
-    trackGeoLocation();
-  console.log(latLng);
-  const { Stores } = props; // Stores which we are pre-rendering
-  const [storesByLocation, setStoresByLocation] = useState("");
+  const { trackLocation, locationErrorMsg, findingLocation } = trackGeoLocation();
+  
+  const { Stores, origin } = props;                         // Stores which we are pre-rendering
+  const {state:{latLong, coffeeStores}, dispatch} = useContext(StoreContext);  // Storing stores by user geo location
+  
 
   useEffect(async () => {
-    if (latLng) {
-      const storesByLocation = await fetchCoffeeStores(latLng);
+    if (latLong) {
+      const storesByLocation = await fetchCoffeeStores(latLong);
       console.log({ storesByLocation });
-      setStoresByLocation(storesByLocation);
+      dispatch({type:ACTION_TYPES.FETCH_COFFEE_STORE, payload: storesByLocation})
     }
-  }, [latLng]);
+  }, [latLong]);
 
   return (
     <div className={styles.container}>
@@ -46,14 +53,14 @@ export default function Home(props) {
         clickHandler={trackLocation}
       />
       {locationErrorMsg && <p>Something went wrong: {locationErrorMsg}</p>}
-      {storesByLocation && (
+      {coffeeStores.length > 0 && (
         <div>
           <h1>Coffee Stores Near you </h1>
-          <CoffeeCards Stores={Stores} />
+          <CoffeeCards Stores={coffeeStores} />
         </div>
       )}
       <div>
-        <h1>Coffee Stores </h1>
+        <h1>Coffee Stores: {origin} </h1>
         <CoffeeCards Stores={Stores} />
       </div>
     </div>

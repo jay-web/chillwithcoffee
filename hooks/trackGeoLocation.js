@@ -1,8 +1,10 @@
-import {useState} from "react";
+import {useState, useContext} from "react";
+import { StoreContext } from "./context";
+import { ACTION_TYPES } from "./storeReducer";
 
 
 const trackGeoLocation = () => {
-    const [latLng, setLatLng] = useState("");
+    const { dispatch } = useContext(StoreContext)
     const [locationErrorMsg,  setLocationErrorMsg] = useState("");
     const [findingLocation, setFindingLocation] = useState(false);
 
@@ -10,7 +12,7 @@ const trackGeoLocation = () => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
 
-        setLatLng(`${latitude},${longitude}`);
+        dispatch({type: ACTION_TYPES.FETCH_LAT_LONG, payload: `${latitude},${longitude}` });
         setLocationErrorMsg("");
         setFindingLocation(false);
     } 
@@ -32,7 +34,6 @@ const trackGeoLocation = () => {
     }
 
     return {
-        latLng,
         trackLocation,
         locationErrorMsg,
         findingLocation

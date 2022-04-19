@@ -4,10 +4,15 @@ import '../styles/globals.css'
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
 />
 
+import {StoreProvider} from "../hooks/context";
+
 function MyApp({ Component, pageProps }) {
   return (
     <div>
-  <Component {...pageProps} />
+      <StoreProvider>
+      <Component {...pageProps} />
+      </StoreProvider>
+ 
    
   </div>
   )

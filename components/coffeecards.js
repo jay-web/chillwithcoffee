@@ -20,9 +20,9 @@ const CoffeeCards = ({Stores}) => {
     return Stores.map((store, index) => {
       return (
         <Grid item xs={4} key={index}>
-          <Item>
+          
             <CoffeeCard store={store} pass={true} />
-          </Item>
+          
         </Grid>
       );
     });
