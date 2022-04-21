@@ -7,7 +7,7 @@ const Banner = (props) => {
  
   return (
     <div style={{ marginBottom: "2rem" }}>
-      <h1>Global coffee</h1>
+      <h1>Chill with Coffee</h1>
       <h2>Find your coffee near to you</h2>
       <CoffeeButton href="" buttonText={props.buttonText} onClick={clickHandler} />
     </div>
