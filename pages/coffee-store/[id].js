@@ -1,26 +1,32 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import CoffeeDetails from "../../components/CoffeeDetails";
+import useSWR from "swr";
 
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-
+import CoffeeButton from "../../components/CoffeeButton";
 import { fetchCoffeeStores } from "../../lib/coffee_store";
-import { getOrigin , isEmpty} from "../../utils";
+import { getOrigin, isEmpty } from "../../utils";
 import { StoreContext } from "../../hooks/context";
 
-export async function getStaticProps(staticProps) {
+export async function getStaticProps({ params }) {
   let origin = getOrigin();
-  const coffeeStores = await fetchCoffeeStores("", origin);
-  const params = staticProps.params;
-  // console.log(params)
-  // console.log(coffeeStores)
-  const store = coffeeStores.find((store) => {
-    return store.id == params.id;
-  });
+  let data = null;
+  try {
+    const coffeeStores = await fetchCoffeeStores("", origin);
+
+    const store = coffeeStores.find((store) => {
+      return store.id == params.id;
+    });
+    data = store;
+  } catch (err) {
+    console.log("error ", err);
+  }
+
   return {
     props: {
-      coffeeStore: store || {},
+      coffeeStore: data ? data : null,
     },
   };
 }
@@ -28,6 +34,7 @@ export async function getStaticProps(staticProps) {
 export async function getStaticPaths() {
   let origin = getOrigin();
   const coffeeStores = await fetchCoffeeStores("", origin);
+
   const paths = coffeeStores.map((coffeeStore) => {
     return {
       params: {
@@ -35,6 +42,7 @@ export async function getStaticPaths() {
       },
     };
   });
+
   // const paths = [ { params: { id: "4fafe8b6e4b078fd5b9dcf49"} }]
   return {
     paths: paths,
@@ -42,22 +50,30 @@ export async function getStaticPaths() {
   };
 }
 
+// * Individual Coffee store page
 const CoffeeStore = (props) => {
   const router = useRouter();
   const id = router.query.id;
+  //  * Set coffee Store initial state which we receiving from getStaticProps if available
   const [coffeeStore, setCoffeeStore] = useState(props.coffeeStore);
-  console.log("cf", coffeeStore);
-  const { state: { coffeeStores } } = useContext(StoreContext);
+
+  // * Set the vote initial state
+  const [vote, setVote] = useState(coffeeStore?.vote || 0);
+
+  // * Extract the coffeeStores data from context
+  const {
+    state: { coffeeStores },
+  } = useContext(StoreContext);
 
   useEffect(() => {
-    if (isEmpty(props.coffeeStore)) {
+    // * If state from getStaticProps is empty
+    if (props.coffeeStore == null) {
+      // * If coffeeStores data coming from context has value
       if (coffeeStores.length > 0) {
-        {
-          const store = coffeeStores.find((store) => {
-            return store.id == id;
-          });
-          setCoffeeStore(store);
-        }
+        const storeFromContext = coffeeStores.find((store) => {
+          return store.id == id;
+        });
+        setCoffeeStore(storeFromContext);
       }
     }
   }, [id]);
@@ -68,13 +84,30 @@ const CoffeeStore = (props) => {
 
   return (
     <React.Fragment>
-      <Box sx={{ flexGrow: 1 }}>
+      {coffeeStore && (
         <Grid container spacing={2}>
+          <Grid
+            item
+            container
+            xs={12}
+            justifyContent="center"
+            alignItems="center"
+            direction="column"
+          >
+            <h1>Chill with {coffeeStore.name}</h1>
+            <CoffeeButton href="/" buttonText="Back to Home" />
+          </Grid>
+
           <Grid item xs={4}>
-            <CoffeeDetails store={coffeeStore} id={id} />
+            <CoffeeDetails
+              store={coffeeStore}
+              id={id}
+              vote={vote}
+              setVote={setVote}
+            />
           </Grid>
         </Grid>
-      </Box>
+      )}
     </React.Fragment>
   );
 };

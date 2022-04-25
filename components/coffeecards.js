@@ -19,7 +19,7 @@ const CoffeeCards = ({Stores}) => {
   const renderCards = () => {
     return Stores.map((store, index) => {
       return (
-        <Grid item xs={4} key={index}>
+        <Grid item xs={12} sm={4} md={4} key={index}>
           
             <CoffeeCard store={store} pass={true} />
           
@@ -30,7 +30,7 @@ const CoffeeCards = ({Stores}) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {renderCards()}
       </Grid>
     </Box>

@@ -36,7 +36,7 @@ export default function Home(props) {
       // const storesByLocation = await fetchCoffeeStores(latLong);
       const response = await fetch(`/api/getStoreByLocation?latLong=${latLong}`);
       const storesByLocation = await response.json();
-      console.log({ storesByLocation });
+      
       dispatch({type:ACTION_TYPES.FETCH_COFFEE_STORE, payload: storesByLocation})
     }
   }, [latLong]);
